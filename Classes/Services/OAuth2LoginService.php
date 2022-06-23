@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Mfc\OAuth2\Services;
@@ -7,7 +8,7 @@ use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use Mfc\OAuth2\ResourceServer\AbstractResourceServer;
 use Mfc\OAuth2\ResourceServer\Registry;
-use TYPO3\CMS\Core\Authentication\AbstractUserAuthentication;
+use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -18,11 +19,10 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
-use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 
 /**
  * Class OAuth2LoginService
- * @package Mfc\OAuth2\Services
+ *
  * @author Christian Spoo <cs@marketing-factory.de>
  */
 class OAuth2LoginService extends AbstractService implements SingletonInterface
@@ -31,22 +31,27 @@ class OAuth2LoginService extends AbstractService implements SingletonInterface
      * @var array
      */
     private $loginData;
+
     /**
      * @var array
      */
     private $authenticationInformation;
+
     /**
      * @var ?AccessToken
      */
     private $currentAccessToken;
+
     /**
      * @var array
      */
     private $extensionConfig;
+
     /**
      * @var AbstractResourceServer
      */
     private $resourceServer;
+
     /**
      * User db table definition
      *
@@ -95,12 +100,13 @@ class OAuth2LoginService extends AbstractService implements SingletonInterface
         if (empty($_GET['state'])) {
             $this->sendOAuthRedirect();
             exit;
-        } elseif ($this->isOAuthRedirectRequest()) {
+        }
+        if ($this->isOAuthRedirectRequest()) {
             try {
                 $this->currentAccessToken = $this->resourceServer->getOAuthProvider()->getAccessToken(
                     'authorization_code',
                     [
-                        'code' => GeneralUtility::_GET('code')
+                        'code' => GeneralUtility::_GET('code'),
                     ]
                 );
             } catch (\Exception $ex) {
@@ -151,7 +157,7 @@ class OAuth2LoginService extends AbstractService implements SingletonInterface
                 $query->expr()->eq(
                     $dbUser['username_column'],
                     $query->createNamedParameter($username, \PDO::PARAM_STR)
-                )
+                ),
             ]);
 
             $user = $query->select('*')
@@ -181,7 +187,7 @@ class OAuth2LoginService extends AbstractService implements SingletonInterface
     private function isOAuthRedirectRequest()
     {
         $state = GeneralUtility::_GET('state');
-        return (!empty($state) && ($state === $_SESSION['oauth2state']));
+        return !empty($state) && ($state === $_SESSION['oauth2state']);
     }
 
     /**
@@ -256,7 +262,7 @@ class OAuth2LoginService extends AbstractService implements SingletonInterface
                 'starttime' => 0,
                 'endtime' => 0,
                 'oauth_identifier' => $this->resourceServer->getOAuthIdentifier($user),
-                'password' => $saltingInstance->getHashedPassword(md5(uniqid()))
+                'password' => $saltingInstance->getHashedPassword(md5(uniqid())),
             ];
 
             $expirationDate = $this->resourceServer->userExpiresAt($user);
@@ -287,7 +293,7 @@ class OAuth2LoginService extends AbstractService implements SingletonInterface
                         'disable' => 0,
                         'starttime' => 0,
                         'endtime' => 0,
-                        'oauth_identifier' => $this->resourceServer->getOAuthIdentifier($user)
+                        'oauth_identifier' => $this->resourceServer->getOAuthIdentifier($user),
                     ]
                 );
 
@@ -305,7 +311,7 @@ class OAuth2LoginService extends AbstractService implements SingletonInterface
                 $record = array_merge(
                     $record,
                     [
-                        'oauth_identifier' => $this->resourceServer->getOAuthIdentifier($user)
+                        'oauth_identifier' => $this->resourceServer->getOAuthIdentifier($user),
                     ]
                 );
             }
