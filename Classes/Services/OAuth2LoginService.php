@@ -80,7 +80,7 @@ class OAuth2LoginService extends AbstractService implements SingletonInterface
         $this->authenticationInformation['db_groups']['table'] = (($subType = 'getUserBe') ? 'be_groups' : 'fe_groups');
         $this->dbUser = $this->authenticationInformation['db_user'];
 
-        if (isset($_SESSION) && !is_array($_SESSION) && $_GET['loginProvider'] === '1529672977') {
+        if ((!isset($_SESSION) || !is_array($_SESSION)) && $_GET['loginProvider'] === '1529672977') {
             @session_start();
         }
     }
@@ -187,7 +187,7 @@ class OAuth2LoginService extends AbstractService implements SingletonInterface
     private function isOAuthRedirectRequest()
     {
         $state = GeneralUtility::_GET('state');
-        return !empty($state) && ($state === $_SESSION['oauth2state']);
+        return !empty($state) && isset($_SESSION) && ($state === $_SESSION['oauth2state']);
     }
 
     /**
