@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Mfc\OAuth2\ResourceServer;
 
 use Gitlab\Client;
+use Http\Client\HttpClient;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use Omines\OAuth2\Client\Provider\Gitlab as GitLabOAuthProvider;
@@ -77,12 +78,17 @@ class GitLab extends AbstractResourceServer
         $this->userOption          = (int)$arguments['gitlabUserOption'];
         $this->blockExternalUser   = (bool)$arguments['blockExternalUser'];
 
+        $collaborators = [];
+        if (isset($arguments['verify']) && !$arguments['verify']) {
+            $collaborators['httpClient'] = new \GuzzleHttp\Client(['verify' => false]);
+        }
+
         $this->oauthProvider = new GitLabOAuthProvider([
             'clientId'     => $arguments['appId'],
             'clientSecret' => $arguments['appSecret'],
             'redirectUri'  => $this->getRedirectUri($arguments['providerName']),
             'domain'       => $arguments['gitlabServer'],
-        ]);
+        ], $collaborators);
     }
 
     /**
