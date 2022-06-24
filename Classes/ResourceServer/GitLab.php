@@ -1,24 +1,23 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Mfc\OAuth2\ResourceServer;
 
 use Gitlab\Client;
-use Http\Client\HttpClient;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use Omines\OAuth2\Client\Provider\Gitlab as GitLabOAuthProvider;
 use Omines\OAuth2\Client\Provider\GitlabResourceOwner;
+use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 
 /**
  * Class GitLab
- * @package Mfc\OAuth2\ResourceServer
  * @author Christian Spoo <cs@marketing-factory.de>
  */
 class GitLab extends AbstractResourceServer
@@ -70,7 +69,8 @@ class GitLab extends AbstractResourceServer
      *
      * @param array $arguments
      */
-    public function __construct(array $arguments) {
+    public function __construct(array $arguments)
+    {
         $this->providerName        = $arguments['providerName'];
         $this->projectName         = $arguments['projectName'];
         $this->adminUserLevel      = (int)$arguments['gitlabAdminUserLevel'];
@@ -105,7 +105,7 @@ class GitLab extends AbstractResourceServer
     public function getAuthorizationUrl(): string
     {
         return $this->oauthProvider->getAuthorizationUrl([
-            'scope' => ['api', 'read_user', 'openid']
+            'scope' => ['api', 'read_user', 'openid'],
         ]);
     }
 
@@ -128,6 +128,7 @@ class GitLab extends AbstractResourceServer
 
     /**
      * @param ResourceOwnerInterface $user
+     * @throws \Http\Client\Exception
      */
     public function loadUserDetails(ResourceOwnerInterface $user): void
     {
@@ -181,7 +182,7 @@ class GitLab extends AbstractResourceServer
             }
 
             $this->gitlabProjectPermissions = [
-                'access_level' => $accessLevel
+                'access_level' => $accessLevel,
             ];
 
             $this->userDetailsLoaded = true;
@@ -239,7 +240,7 @@ class GitLab extends AbstractResourceServer
 
             $currentRecord = [
                 'pid' => 0,
-                'password' => $saltingInstance->getHashedPassword(md5(uniqid()))
+                'password' => $saltingInstance->getHashedPassword(md5(uniqid())),
             ];
         }
 
@@ -254,7 +255,7 @@ class GitLab extends AbstractResourceServer
                     $this->gitlabProjectPermissions['access_level'] ?? 0,
                     $authentificationInformation['db_groups']['table']
                 ),
-                'options' => $this->userOption
+                'options' => $this->userOption,
             ]
         );
 
@@ -295,7 +296,7 @@ class GitLab extends AbstractResourceServer
     }
 
     /**
-     * @param integer $level
+     * @param int $level
      * @param string $table
      * @return array
      */
@@ -345,7 +346,7 @@ class GitLab extends AbstractResourceServer
     {
         $this->loadUserDetails($user);
 
-        return !is_null($this->gitlabProjectPermissions) && is_array($this->gitlabProjectPermissions)
+        return is_array($this->gitlabProjectPermissions)
             && ($this->gitlabProjectPermissions['access_level'] > 0);
     }
 }

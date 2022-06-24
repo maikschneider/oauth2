@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Mfc\OAuth2\LoginProvider;
@@ -13,7 +14,6 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Class OAuth2LoginProvider
- * @package Mfc\OAuth2\LoginProvider
  * @author Christian Spoo <cs@marketing-factory.de>
  */
 class OAuth2LoginProvider implements LoginProviderInterface
@@ -50,7 +50,7 @@ class OAuth2LoginProvider implements LoginProviderInterface
 
         if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 11000000) {
             $view->assign('baseLayout', 'OAuth2Login-11');
-        } else if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 9000000) {
+        } elseif (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) >= 9000000) {
             $view->assign('baseLayout', 'OAuth2Login-9');
         } else {
             $view->assign('baseLayout', 'OAuth2Login');

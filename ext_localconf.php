@@ -18,7 +18,7 @@ defined('TYPO3_MODE') || die();
         'quality' => 50,
         'os' => '',
         'exec' => '',
-        'className' => OAuth2LoginService::class
+        'className' => OAuth2LoginService::class,
     ]
 );
 
@@ -33,6 +33,6 @@ if ($extensionConfig['enableBackendLogin']) {
         'provider' => OAuth2LoginProvider::class,
         'sorting' => 25,
         'icon-class' => 'fa-sign-in',
-        'label' => 'LLL:EXT:oauth2/Resources/Private/Language/locallang.xlf:oauth2.login.link'
+        'label' => 'LLL:EXT:oauth2/Resources/Private/Language/locallang.xlf:oauth2.login.link',
     ];
 }
